@@ -19,8 +19,8 @@ public class PlayerMovement : MonoBehaviour
     private GameObject currentHeldMask;
 
     [Header("UI Settings")]
-    public GameObject nameTagPrefab; // UI World Space Canvas prefab
-    private GameObject currentUI;
+    public GameObject nameTagPrefab;    // Blueprint Canvas prefab for UI above Object's head
+    private GameObject currentUIAboveHead;       // Instance of each UI above Object's head
 
     private Collider2D currentHit;
 
@@ -42,7 +42,7 @@ public class PlayerMovement : MonoBehaviour
         animator.SetFloat("Vertical",   movement.y);
         animator.SetFloat("Speed",      movement.sqrMagnitude);
 
-        // Check for Object Layer Mask every frame
+        // Check for Object Layer Mask for every frame the main character exist
         currentHit = Physics2D.OverlapCircle(
             transform.position,
             interactRange,
@@ -129,30 +129,30 @@ public class PlayerMovement : MonoBehaviour
     private void ShowNameTag(Transform target)
     {
         // add a specific mask here to see that name only
-        if (currentUI == null)
+        if (currentUIAboveHead == null)
         {
-            currentUI = Instantiate(nameTagPrefab);
+            currentUIAboveHead = Instantiate(nameTagPrefab);
         }
 
         // Position UI text above mask object
-        currentUI.transform.position = target.position + new Vector3(0, 0.8f, 0);
+        currentUIAboveHead.transform.position = target.position + new Vector3(0, 0.8f, 0);
 
         // Set the text to the mask's name
-        TextMeshProUGUI tmpText = currentUI.GetComponentInChildren<TextMeshProUGUI>();
+        TextMeshProUGUI tmpText = currentUIAboveHead.GetComponentInChildren<TextMeshProUGUI>();
         if (tmpText != null)
         {
             tmpText.text = target.gameObject.name;
         }
 
-        currentUI.SetActive(true);
+        currentUIAboveHead.SetActive(true);
     }
 
     // Helper function: Hide name tag if not nearby
     private void HideNameTag()
     {
-        if (currentUI != null)
+        if (currentUIAboveHead != null)
         {
-            currentUI.SetActive(false);
+            currentUIAboveHead.SetActive(false);
         }
     }
 

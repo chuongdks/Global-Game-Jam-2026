@@ -6,13 +6,13 @@ public class EmotionNPC : MonoBehaviour
     public string npcName = "Sad Villager";
 
     [Header("Dialogues")]
-    public string[] dialogueLines; // The initial conversation lines
-    public string successDialogue = "Oh! This Joy mask is exactly what I needed. Thank you!";
-    public string wrongMaskDialogue = "Hmm. This Doesnt feels right. But you'll figure it out!";
+    public string[] introDialogues;     // initial conversation lines
+    public string[] successDialogue;    // Right Mask Dialogues
+    public string[] wrongMaskDialogue;  // Wrong Mask Dialogues
 
     [Header("Win Condition")]
-    public string correctMaskName = "Mask_Confuse(Clone)";
-    public int goldReward = 50;
+    public string correctMaskName;
+    public int goldReward;
 
     private DialogueManager manager;
 
@@ -31,7 +31,7 @@ public class EmotionNPC : MonoBehaviour
     // This is the version called by PlayerInteraction.cs
     public void Interact(GameObject heldItem)
     {
-        // check if player is bringing a masksd
+        // check if player is bringing a masks
         if (heldItem != null)
         {
             CheckMask(heldItem);
@@ -39,7 +39,7 @@ public class EmotionNPC : MonoBehaviour
         else
         {
             // If hand is empty, start normal conversation
-            manager.StartDialogue(dialogueLines);
+            manager.StartDialogue(introDialogues);
         }
     }
 
@@ -48,13 +48,16 @@ public class EmotionNPC : MonoBehaviour
         if (heldItem.name.Contains(correctMaskName))
         {
             // Show success in console (or trigger a special success dialogue line)
-            Debug.Log($"{npcName}: {successDialogue}");
-            Debug.Log($"You earned {goldReward} gold!");
+            //Debug.Log($"{npcName}: {successDialogue}");
+            //Debug.Log($"You earned {goldReward} gold!");
+            manager.StartDialogue(successDialogue);
             Destroy(heldItem);
         }
         else
         {
-            Debug.Log($"{npcName}: {wrongMaskDialogue}");
+            // Debug.Log($"{npcName}: {wrongMaskDialogue}");
+            manager.StartDialogue(wrongMaskDialogue);
+            Destroy(heldItem);
         }
     }
 }

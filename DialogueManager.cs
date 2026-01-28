@@ -77,7 +77,6 @@ public class DialogueManager : MonoBehaviour
 
         // store next sentence in currentFullSentence
         currentFullSentence = sentences.Dequeue();
-        Debug.Log(currentFullSentence);
 
         // Stop any current scrolling before starting a new one
         StopAllCoroutines();
