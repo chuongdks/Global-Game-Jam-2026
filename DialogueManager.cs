@@ -27,7 +27,7 @@ public class DialogueManager : MonoBehaviour
         
     }
 
-    //Helper function: EmotionNPC use this, not DialogueManager (this is the starting point function)
+    //Helper function: EmotionNPC use this, not DialogueManager (this is the starting point of the class somehow)
     public void StartDialogue(string[] lines, NPCNavigation npcNav)
     {
         isDialogueActive = true;

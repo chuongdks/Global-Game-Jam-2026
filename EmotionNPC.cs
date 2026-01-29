@@ -48,22 +48,29 @@ public class EmotionNPC : MonoBehaviour
         // Get reference to the navigation script
         NPCNavigation nav = GetComponent<NPCNavigation>();
 
+        // Position the mask on the NPC's face
+        Transform faceSocket = transform.Find("FaceSocket");
+        if (faceSocket != null)
+        {
+            heldItem.transform.SetParent(faceSocket);
+            heldItem.transform.localPosition = Vector3.zero;
+            heldItem.transform.localRotation = Quaternion.identity;
+        }
+
+        // check what mask the player gave to NPC and respond
         if (heldItem.name.Contains(correctMaskName))
         {
             // Show success in console (or trigger a special success dialogue line)
             //Debug.Log($"{npcName}: {successDialogue}");   //Debug.Log($"You earned {goldReward} gold!");
             manager.StartDialogue(successDialogue, nav);    // Pass 'nav' so manager tell THIS npc to leave the store
-            Destroy(heldItem);
         }
         else
         {
             // Debug.Log($"{npcName}: {wrongMaskDialogue}");
             manager.StartDialogue(wrongMaskDialogue, nav);  // Pass 'nav' so manager tell THIS npc to leave the store
-            Destroy(heldItem);
         }
 
         // Cleanup and notify ShopManager
         FindFirstObjectByType<ShopManager>().CustomerServed();  // Tell manager to prep next NPC
-        Destroy(heldItem);
     }
 }
