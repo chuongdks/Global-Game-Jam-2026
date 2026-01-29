@@ -19,6 +19,7 @@ public class DialogueManager : MonoBehaviour
 
     private string currentFullSentence;     // Tracks the full text of the current line
     private bool isTyping;                  // Tracks if the typewriter effect is running
+    private NPCNavigation currentNPCNav;// Tracks current NPC
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -27,12 +28,15 @@ public class DialogueManager : MonoBehaviour
     }
 
     //Helper function: EmotionNPC use this, not DialogueManager (this is the starting point function)
-    public void StartDialogue(string[] lines)
+    public void StartDialogue(string[] lines, NPCNavigation npcNav)
     {
         isDialogueActive = true;
         playerMovement.enabled = false; // Freeze player
         dialoguePanel.SetActive(true);
         isTyping = false;
+
+        // reference to NPC's navigation
+        currentNPCNav = npcNav;
 
         sentences.Clear();
         foreach (string line in lines)
@@ -64,14 +68,14 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // Helper function: Display next sentence
     public void DisplayNextSentence()
     {
         // end dialogue and unfreeze player
         if (sentences.Count == 0)
         {            
-            isDialogueActive = false;
-            playerMovement.enabled = true; // Unfreeze player
-            dialoguePanel.SetActive(false);
+
+            EndDialogue();
             return;
         }
 
@@ -96,5 +100,20 @@ public class DialogueManager : MonoBehaviour
         }
 
         isTyping = false;   // Mark as finished so press E for next dialogue
+    }
+
+    // Helper function: At the End of the dialogue array
+    void EndDialogue()
+    {
+        isDialogueActive = false;
+        playerMovement.enabled = true; // Unfreeze player
+        dialoguePanel.SetActive(false);
+
+        // In final dialgoue, Manager can kick the NPC out now instead of NPC walk off while talking to worker
+        if (currentNPCNav != null)
+        {
+            currentNPCNav.currentState = NPCNavigation.NPCState.Exiting;
+            currentNPCNav = null; // Clear for the next person
+        }
     }
 }
