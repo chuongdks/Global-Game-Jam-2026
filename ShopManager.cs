@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ShopManager : MonoBehaviour
 {
@@ -9,6 +10,10 @@ public class ShopManager : MonoBehaviour
 
     private GameObject currentNPC;
     private int currentNPCIndex = 0; // Tracks NPC to spawn next
+
+    [Header("Score Tracking")]
+    public int correctCount = 0;
+    public int wrongCount = 0;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -32,6 +37,7 @@ public class ShopManager : MonoBehaviour
         if (currentNPCIndex >= npcPrefabs.Length)
         {
             Debug.Log("No more customers for the day");
+            ShowGameOver();
             return;
         }
 
@@ -44,9 +50,33 @@ public class ShopManager : MonoBehaviour
         currentNPCIndex++;
     }
 
-    // This will be called by the NPC script after the transaction is done
+    // called by emotionNPC script after transaction is done
     public void CustomerServed()
     {
         Invoke("SpawnNextNPC", 2f); // Wait 2 seconds before the next person arrives
+    }
+
+    // record the correct and wrong mask given
+    public void RecordResult(bool isCorrect)
+    {
+        if (isCorrect)
+        {
+            correctCount++;
+            Debug.Log("Score: " + correctCount + " Correct");
+        }
+        else
+        { 
+            wrongCount++;
+            Debug.Log("Score: " + wrongCount + " Wrong");
+        }
+    }
+
+
+    void ShowGameOver()
+    {
+        // Store stats in a static class or PlayerPrefs to read them in the next scene
+        PlayerPrefs.SetInt("Correct", correctCount);
+        PlayerPrefs.SetInt("Wrong", wrongCount);
+        SceneManager.LoadScene("GameOver");
     }
 }

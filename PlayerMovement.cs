@@ -23,6 +23,7 @@ public class PlayerMovement : MonoBehaviour
     private GameObject currentUIAboveHead;       // Instance of each UI above Object's head
 
     private Collider2D currentHit;
+    private float lastX, lastY;         // last position of the move direction
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -37,10 +38,21 @@ public class PlayerMovement : MonoBehaviour
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
+        // update Last movement while player is moving
+        if (movement.x != 0 || movement.y != 0)
+        {
+            lastX = movement.x;
+            lastY = movement.y;
+        }
+
         // set value to the Animator parameter
         animator.SetFloat("Horizontal", movement.x);
         animator.SetFloat("Vertical",   movement.y);
         animator.SetFloat("Speed",      movement.sqrMagnitude);
+
+        // Send the "Last" directions to the Animator after player stop
+        animator.SetFloat("LastMoveX", lastX);
+        animator.SetFloat("LastMoveY", lastY);
 
         // Check for Object Layer Mask for every frame the main character exist
         currentHit = Physics2D.OverlapCircle(

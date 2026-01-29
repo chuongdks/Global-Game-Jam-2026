@@ -15,7 +15,7 @@ public class DialogueManager : MonoBehaviour
     public bool isDialogueActive { get; private set; }
 
     // Reference to Player script
-    public PlayerMovement playerMovement;
+    public PlayerMovement player;
 
     private string currentFullSentence;     // Tracks the full text of the current line
     private bool isTyping;                  // Tracks if the typewriter effect is running
@@ -31,7 +31,7 @@ public class DialogueManager : MonoBehaviour
     public void StartDialogue(string[] lines, NPCNavigation npcNav)
     {
         isDialogueActive = true;
-        playerMovement.enabled = false; // Freeze player
+        player.enabled = false; // Freeze player
         dialoguePanel.SetActive(true);
         isTyping = false;
 
@@ -106,7 +106,7 @@ public class DialogueManager : MonoBehaviour
     void EndDialogue()
     {
         isDialogueActive = false;
-        playerMovement.enabled = true; // Unfreeze player
+        player.enabled = true; // Unfreeze player
         dialoguePanel.SetActive(false);
 
         // In final dialgoue, Manager can kick the NPC out now instead of NPC walk off while talking to worker
