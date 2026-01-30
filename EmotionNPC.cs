@@ -40,8 +40,8 @@ public class EmotionNPC : MonoBehaviour
         }
         else
         {
-            // If hand is empty, start normal conversation
-            dialogueManager.StartDialogue(introDialogues, null);
+            // If hand is empty, start Intro Dialogue
+            dialogueManager.StartDialogue(introDialogues, null, false);
         }
     }
 
@@ -60,21 +60,18 @@ public class EmotionNPC : MonoBehaviour
             heldItem.transform.localRotation = Quaternion.identity;
         }
 
-        // Set NPC navigation to Exiting at this line cuz EndDialogue() need it to check if it is not IntroDialoges
-        nav.currentState = NPCNavigation.NPCState.Exiting;
-
         // check what mask the player gave to NPC and respond
         if (heldItem.name.Contains(correctMaskName))
         {
             // Show success in console (or trigger a special success dialogue line)
             //Debug.Log($"{npcName}: {successDialogue}");   //Debug.Log($"You earned {goldReward} gold!");
-            dialogueManager.StartDialogue(successDialogue, nav);    // Pass 'nav' so dialogueManager tell THIS npc to leave the store
+            dialogueManager.StartDialogue(successDialogue, nav, true);    // Pass 'nav' so dialogueManager tell THIS npc to leave the store
             shopManager.RecordResult(true); // Record transaction good
         }
         else
         {
             // Debug.Log($"{npcName}: {wrongMaskDialogue}");
-            dialogueManager.StartDialogue(wrongMaskDialogue, nav);  // Pass 'nav' so dialogueManager tell THIS npc to leave the store
+            dialogueManager.StartDialogue(wrongMaskDialogue, nav, true);  // Pass 'nav' so dialogueManager tell THIS npc to leave the store
             shopManager.RecordResult(false); // Record transaction bad
         }
         // Game idea: SPecific Mask trigger a different dialogues

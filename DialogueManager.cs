@@ -20,7 +20,8 @@ public class DialogueManager : MonoBehaviour
     private string currentFullSentence;     // Tracks the full text of the current line
     private bool isTyping;                  // Tracks if the typewriter effect is running
     private NPCNavigation currentNPCNav;    // reference current NPC
-    private ShopManager shopManager;               // reference the ShopManager
+    private ShopManager shopManager;        // reference the ShopManager
+    private bool shouldTriggerNextSpawn;    // flag to control ShopManager to spawn NPC
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -29,7 +30,7 @@ public class DialogueManager : MonoBehaviour
     }
 
     //Helper function: EmotionNPC use this, not DialogueManager (this is the starting point of the class somehow)
-    public void StartDialogue(string[] lines, NPCNavigation npcNav)
+    public void StartDialogue(string[] lines, NPCNavigation npcNav, bool isEndingConversation)
     {
         isDialogueActive = true;
         player.enabled = false; // Freeze player
@@ -38,13 +39,14 @@ public class DialogueManager : MonoBehaviour
 
         // reference to NPC's navigation (this variable and method should be at Start() or something)
         currentNPCNav = npcNav;
+        this.shouldTriggerNextSpawn = isEndingConversation;
 
+        // Store line in senteces Queue
         sentences.Clear();
         foreach (string line in lines)
         {
             sentences.Enqueue(line);
         }
-
         DisplayNextSentence();
     }
 
@@ -88,6 +90,26 @@ public class DialogueManager : MonoBehaviour
         StartCoroutine(TypeSentence(currentFullSentence));
     }
 
+    // Helper function: At the End of the dialogue array
+    void EndDialogue()
+    {
+        isDialogueActive = false;
+        player.enabled = true; // Unfreeze player
+        dialoguePanel.SetActive(false);
+
+        // Check if NPC is in Exit State, then tell shopManager to spawn new NPC
+        if (currentNPCNav != null && shouldTriggerNextSpawn)
+        {
+            currentNPCNav.currentState = NPCNavigation.NPCState.Exiting;
+            if (shopManager != null)
+            {
+                shopManager.CustomerServed();
+            }
+        }
+        currentNPCNav = null;
+        shouldTriggerNextSpawn = false;
+    }
+
     // Typewriter Effect 
     IEnumerator TypeSentence(string sentence)
     {
@@ -101,26 +123,5 @@ public class DialogueManager : MonoBehaviour
         }
 
         isTyping = false;   // Mark as finished so press E for next dialogue
-    }
-
-    // Helper function: At the End of the dialogue array
-    void EndDialogue()
-    {
-        isDialogueActive = false;
-        player.enabled = true; // Unfreeze player
-        dialoguePanel.SetActive(false);
-
-        // Check if NPC is in Exit State, then tell shopManager to spawn new NPC
-        if (currentNPCNav != null)
-        {
-            if (currentNPCNav.currentState == NPCNavigation.NPCState.Exiting)
-            {
-                if (shopManager != null)
-                {
-                    shopManager.CustomerServed();
-                }
-            }
-            currentNPCNav = null;
-        }
     }
 }
