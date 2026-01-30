@@ -14,14 +14,14 @@ public class EmotionNPC : MonoBehaviour
     public string correctMaskName;
     public int goldReward;
 
-    private DialogueManager manager;
-    private ShopManager shop;
+    private DialogueManager dialogueManager;
+    private ShopManager shopManager;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        manager = FindFirstObjectByType<DialogueManager>();
-        shop = FindFirstObjectByType<ShopManager>();
+        dialogueManager = FindFirstObjectByType<DialogueManager>();
+        shopManager = FindFirstObjectByType<ShopManager>();
     }
 
     // Update is called once per frame
@@ -41,7 +41,7 @@ public class EmotionNPC : MonoBehaviour
         else
         {
             // If hand is empty, start normal conversation
-            manager.StartDialogue(introDialogues, null);
+            dialogueManager.StartDialogue(introDialogues, null);
         }
     }
 
@@ -60,22 +60,33 @@ public class EmotionNPC : MonoBehaviour
             heldItem.transform.localRotation = Quaternion.identity;
         }
 
+        // Set NPC navigation to Exiting at this line cuz EndDialogue() need it to check if it is not IntroDialoges
+        nav.currentState = NPCNavigation.NPCState.Exiting;
+
         // check what mask the player gave to NPC and respond
         if (heldItem.name.Contains(correctMaskName))
         {
             // Show success in console (or trigger a special success dialogue line)
             //Debug.Log($"{npcName}: {successDialogue}");   //Debug.Log($"You earned {goldReward} gold!");
-            manager.StartDialogue(successDialogue, nav);    // Pass 'nav' so manager tell THIS npc to leave the store
-            shop.RecordResult(true); // Record transaction good
+            dialogueManager.StartDialogue(successDialogue, nav);    // Pass 'nav' so dialogueManager tell THIS npc to leave the store
+            shopManager.RecordResult(true); // Record transaction good
         }
         else
         {
             // Debug.Log($"{npcName}: {wrongMaskDialogue}");
-            manager.StartDialogue(wrongMaskDialogue, nav);  // Pass 'nav' so manager tell THIS npc to leave the store
-            shop.RecordResult(false); // Record transaction bad
+            dialogueManager.StartDialogue(wrongMaskDialogue, nav);  // Pass 'nav' so dialogueManager tell THIS npc to leave the store
+            shopManager.RecordResult(false); // Record transaction bad
         }
+        // Game idea: SPecific Mask trigger a different dialogues
+        //else if(heldItem.name.Contains(weirdMaskName))
+        //{
+        //    // Debug.Log($"{npcName}: {wrongMaskDialogue}");
+        //    dialogueManager.StartDialogue(differentDialogue, nav);  // Pass 'nav' so dialogueManager tell THIS npc to leave the store
+        //    shopManager.RecordResult(false); // Record transaction bad
+        //}
+
 
         // Cleanup and notify ShopManager
-        shop.CustomerServed();  // Tell manager to prep next NPC
+        // shopManager.CustomerServed();  // Tell dialogueManager to prep next NPC
     }
 }

@@ -19,12 +19,13 @@ public class DialogueManager : MonoBehaviour
 
     private string currentFullSentence;     // Tracks the full text of the current line
     private bool isTyping;                  // Tracks if the typewriter effect is running
-    private NPCNavigation currentNPCNav;// Tracks current NPC
+    private NPCNavigation currentNPCNav;    // reference current NPC
+    private ShopManager shopManager;               // reference the ShopManager
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        shopManager = FindFirstObjectByType<ShopManager>();
     }
 
     //Helper function: EmotionNPC use this, not DialogueManager (this is the starting point of the class somehow)
@@ -35,7 +36,7 @@ public class DialogueManager : MonoBehaviour
         dialoguePanel.SetActive(true);
         isTyping = false;
 
-        // reference to NPC's navigation
+        // reference to NPC's navigation (this variable and method should be at Start() or something)
         currentNPCNav = npcNav;
 
         sentences.Clear();
@@ -75,7 +76,7 @@ public class DialogueManager : MonoBehaviour
         if (sentences.Count == 0)
         {            
 
-            EndDialogue();
+            EndDialogue();            
             return;
         }
 
@@ -109,11 +110,17 @@ public class DialogueManager : MonoBehaviour
         player.enabled = true; // Unfreeze player
         dialoguePanel.SetActive(false);
 
-        // In final dialgoue, Manager can kick the NPC out now instead of NPC walk off while talking to worker
+        // Check if NPC is in Exit State, then tell shopManager to spawn new NPC
         if (currentNPCNav != null)
         {
-            currentNPCNav.currentState = NPCNavigation.NPCState.Exiting;
-            currentNPCNav = null; // Clear for the next person
+            if (currentNPCNav.currentState == NPCNavigation.NPCState.Exiting)
+            {
+                if (shopManager != null)
+                {
+                    shopManager.CustomerServed();
+                }
+            }
+            currentNPCNav = null;
         }
     }
 }
