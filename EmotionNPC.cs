@@ -14,8 +14,10 @@ public class EmotionNPC : MonoBehaviour
     public string correctMaskName;
     public int goldReward;
 
+    // private variables
     private DialogueManager dialogueManager;
     private ShopManager shopManager;
+    private bool hasIntroduced = false; // Tracks if Intro dialogues has played
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -30,9 +32,17 @@ public class EmotionNPC : MonoBehaviour
         
     }
 
-    // This is the version called by PlayerInteraction.cs
+    // called by PlayerMovement script
     public void Interact(GameObject heldItem)
     {
+        // trigger intro DIalogue when first time talking to the NPC
+        if (!hasIntroduced)
+        {
+            dialogueManager.StartDialogue(introDialogues, null, false);
+            hasIntroduced = true; 
+            return;
+        }
+
         // check if player is bringing a masks
         if (heldItem != null)
         {
@@ -64,13 +74,11 @@ public class EmotionNPC : MonoBehaviour
         if (heldItem.name.Contains(correctMaskName))
         {
             // Show success in console (or trigger a special success dialogue line)
-            //Debug.Log($"{npcName}: {successDialogue}");   //Debug.Log($"You earned {goldReward} gold!");
             dialogueManager.StartDialogue(successDialogue, nav, true);    // Pass 'nav' so dialogueManager tell THIS npc to leave the store
             shopManager.RecordResult(true); // Record transaction good
         }
         else
         {
-            // Debug.Log($"{npcName}: {wrongMaskDialogue}");
             dialogueManager.StartDialogue(wrongMaskDialogue, nav, true);  // Pass 'nav' so dialogueManager tell THIS npc to leave the store
             shopManager.RecordResult(false); // Record transaction bad
         }

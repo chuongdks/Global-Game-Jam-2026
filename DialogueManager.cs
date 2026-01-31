@@ -17,6 +17,7 @@ public class DialogueManager : MonoBehaviour
     // Reference to Player script
     public PlayerMovement player;
 
+    // private variables
     private string currentFullSentence;     // Tracks the full text of the current line
     private bool isTyping;                  // Tracks if the typewriter effect is running
     private NPCNavigation currentNPCNav;    // reference current NPC

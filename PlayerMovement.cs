@@ -140,7 +140,7 @@ public class PlayerMovement : MonoBehaviour
     // Helper function: Show the name of Game Object when near
     private void ShowNameTag(Transform target)
     {
-        // add a specific mask here to see that name only
+        // add a specific Layer here to see that name only
         if (currentUIAboveHead == null)
         {
             currentUIAboveHead = Instantiate(nameTagPrefab);
@@ -153,7 +153,21 @@ public class PlayerMovement : MonoBehaviour
         TextMeshProUGUI tmpText = currentUIAboveHead.GetComponentInChildren<TextMeshProUGUI>();
         if (tmpText != null)
         {
-            tmpText.text = target.gameObject.name;
+            // Get layer index
+            int npcLayer = LayerMask.NameToLayer("NPC");
+            string objectName = target.gameObject.name.Replace("Varient(Clone)", "").Trim();
+
+            // Experiment: If it's an NPC, add the interaction prompt
+            if (target.gameObject.layer == npcLayer)
+            {
+                // Context prompt for NPC
+                tmpText.text = $"<color=#FFFF00><size=80%>[Press E to Interact]</size></color>"; // {objectName}\n
+            }
+            else
+            {
+                // For Masks or other objects, just show the name
+                tmpText.text = objectName;
+            }
         }
 
         currentUIAboveHead.SetActive(true);
