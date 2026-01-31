@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using UnityEngine;
 
 public class EmotionNPC : MonoBehaviour
@@ -14,6 +15,8 @@ public class EmotionNPC : MonoBehaviour
     public string correctMaskName;
     public int goldReward;
 
+    public string uniqueID;             // Give each NPC a name 
+
     // private variables
     private DialogueManager dialogueManager;
     private ShopManager shopManager;
@@ -24,6 +27,14 @@ public class EmotionNPC : MonoBehaviour
     {
         dialogueManager = FindFirstObjectByType<DialogueManager>();
         shopManager = FindFirstObjectByType<ShopManager>();
+
+        // Check if this NPC already has a mask saved
+        if (PlayerPrefs.HasKey(uniqueID))
+        {
+            UnityEngine.Debug.Log("test");
+            string savedMaskName = PlayerPrefs.GetString(uniqueID);
+            LoadSavedMask(savedMaskName);
+        }
     }
 
     // Update is called once per frame
@@ -68,7 +79,15 @@ public class EmotionNPC : MonoBehaviour
             heldItem.transform.SetParent(faceSocket);
             heldItem.transform.localPosition = Vector3.zero;
             heldItem.transform.localRotation = Quaternion.identity;
+
+            // Tell PlayerMovement scriptto clear currentHeldMask
+            FindFirstObjectByType<PlayerMovement>().ClearHeldMask();
         }
+
+        // Save the mask choice permanently
+        UnityEngine.Debug.Log(heldItem.name);
+        PlayerPrefs.SetString(uniqueID, heldItem.name);
+        PlayerPrefs.Save();
 
         // check what mask the player gave to NPC and respond
         if (heldItem.name.Contains(correctMaskName))
@@ -93,5 +112,22 @@ public class EmotionNPC : MonoBehaviour
 
         // Cleanup and notify ShopManager
         // shopManager.CustomerServed();  // Tell dialogueManager to prep next NPC
+    }
+
+    // 
+    void LoadSavedMask(string maskName)
+    {
+        // You would need a reference to your Mask Prefabs to Instantiate them
+        // This is a simplified example:
+        UnityEngine.Debug.Log("test");
+        GameObject maskPrefab = Resources.Load<GameObject>(maskName); // "Masks/" +
+        if (maskPrefab != null)
+        {
+            GameObject newMask = Instantiate(maskPrefab);
+            Transform faceSocket = transform.Find("FaceSocket");
+            newMask.transform.SetParent(faceSocket);
+            newMask.transform.localPosition = Vector3.zero;
+            newMask.GetComponent<Collider2D>().enabled = false;
+        }
     }
 }

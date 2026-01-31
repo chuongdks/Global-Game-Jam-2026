@@ -34,7 +34,7 @@ public class NPCNavigation : MonoBehaviour
             MoveTowards(exitPoint.position);
             if (Vector2.Distance(transform.position, exitPoint.position) < 0.1f)
             {
-                Destroy(gameObject);
+                // Destroy(gameObject);
             }
         }
     }

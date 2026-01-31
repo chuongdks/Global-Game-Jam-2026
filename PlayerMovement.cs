@@ -81,7 +81,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (currentHit.gameObject.layer == npcLayer)
             {
-                currentHit.GetComponent<EmotionNPC>().Interact(currentHeldMask);
+                currentHit.GetComponent<EmotionNPC>().Interact(currentHeldMask);    // use EmotionNPC Interact() to do Mask stuff
             }
             else if (currentHit.gameObject.layer == maskLayer)
             {
@@ -109,8 +109,9 @@ public class PlayerMovement : MonoBehaviour
                 
             }
 
-            // Pick up new mask
-            currentHeldMask = Instantiate(maskCollider.gameObject);
+            // Init new mask and change name (get rid of "(Clone")
+            currentHeldMask = Instantiate(maskCollider.gameObject); // clone created, remember to change name "(Clone)"
+            currentHeldMask.name = maskCollider.gameObject.name;
 
             // Attach it to player's Hand Object
             currentHeldMask.transform.SetParent(handPosition);
@@ -180,6 +181,12 @@ public class PlayerMovement : MonoBehaviour
         {
             currentUIAboveHead.SetActive(false);
         }
+    }
+
+    // Helper function: remove mask from PlayerMovement script
+    public void ClearHeldMask()
+    {
+        currentHeldMask = null;
     }
 
     // Visualizes the interaction range in the Editor

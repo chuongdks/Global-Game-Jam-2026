@@ -30,14 +30,14 @@ public class ShopManager : MonoBehaviour
     public void SpawnNextNPC()
     {
         // Pick a random NPC from the array
-        // int randomIndex = Random.Range(0, npcPrefabs.Length);
-        // currentNPC = Instantiate(npcPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
+        //int randomIndex = Random.Range(0, npcPrefabs.Length);
+        //currentNPC = Instantiate(npcPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
 
         // Spawn NPC by order
         if (currentNPCIndex >= npcPrefabs.Length)
         {
             Debug.Log("No more customers for the day");
-            ShowGameOver();
+            // ShowGameOver();
             return;
         }
 
