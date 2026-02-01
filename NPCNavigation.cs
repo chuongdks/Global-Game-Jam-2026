@@ -1,8 +1,9 @@
+using System.Collections;
 using UnityEngine;
 
 public class NPCNavigation : MonoBehaviour
 {
-    public enum NPCState { Entering, Waiting, Exiting }
+    public enum NPCState { Entering, Waiting, Exiting, Roaming }
     public NPCState currentState = NPCState.Entering;
 
     [Header("NPC Speed")]
@@ -10,6 +11,10 @@ public class NPCNavigation : MonoBehaviour
     private Transform exitPoint;
     public float walkSpeed = 2f;
 
+    [Header("NPC Roaming Around")]
+    public float wanderRadius = 5f;     // NPC will wander around this radius
+    private Vector3 wanderTarget;       // Randomly choose a wandering spot near NPC
+    private bool isWaitingAtPoint;      // check if NPC is waiting for a new direction
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -34,12 +39,18 @@ public class NPCNavigation : MonoBehaviour
             MoveTowards(exitPoint.position);
             if (Vector2.Distance(transform.position, exitPoint.position) < 0.1f)
             {
-                // Destroy(gameObject);
+                Destroy(gameObject);
             }
         }
-        else if (currentState == NPCState.Waiting)
+        //else if (currentState == NPCState.Waiting)
+        //{
+        //    // problaby do something for Scene 2 cuz NPC has already spawned in
+        //}
+
+        // handle roaming state
+        if (currentState == NPCState.Roaming)
         {
-            // problaby do something for Scene 2 cuz NPC has already spawned in
+            HandleRoaming();
         }
     }
 
@@ -55,5 +66,29 @@ public class NPCNavigation : MonoBehaviour
     {
         stationPoint = station;
         exitPoint = exit;
+    }
+
+    void HandleRoaming()
+    {
+        if (Vector2.Distance(transform.position, wanderTarget) < 0.2f && !isWaitingAtPoint)
+        {
+            StartCoroutine(WaitAndPickNewPoint());
+        }
+        else if (!isWaitingAtPoint)
+        {
+            MoveTowards(wanderTarget);
+        }
+    }
+
+    IEnumerator WaitAndPickNewPoint()
+    {
+        isWaitingAtPoint = true;
+        yield return new WaitForSeconds(Random.Range(2f, 5f)); // Wait before moving
+
+        // Pick a random spot near the NPC's current position
+        Vector2 randomPoint = (Vector2)transform.position + Random.insideUnitCircle * wanderRadius;
+        wanderTarget = new Vector3(randomPoint.x, randomPoint.y, 0);
+
+        isWaitingAtPoint = false;
     }
 }

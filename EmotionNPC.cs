@@ -50,14 +50,6 @@ public class EmotionNPC : MonoBehaviour
     // called by PlayerMovement script
     public void Interact(GameObject heldItem)
     {
-        // trigger intro Dialogue when first time talking to the NPC
-        if (!hasIntroduced)
-        {
-            dialogueManager.StartDialogue(introDialogues, null, false);
-            hasIntroduced = true; 
-            return;
-        }
-
         // check If NPCs already has a mask
         if (hasMaskEquipped)
         {
@@ -70,6 +62,14 @@ public class EmotionNPC : MonoBehaviour
             {
                 dialogueManager.StartDialogue(maskedWrongGreeting, null, false);
             }
+            return;
+        }
+
+        // trigger intro Dialogue when first time talking to the NPC
+        if (!hasIntroduced)
+        {
+            dialogueManager.StartDialogue(introDialogues, null, false);
+            hasIntroduced = true; 
             return;
         }
 

@@ -3,17 +3,21 @@ using UnityEngine.SceneManagement;
 
 public class ShopManager : MonoBehaviour
 {
-    public GameObject[] npcPrefabs; // different NPCs prefabs 
+    public GameObject[] npcPrefabs;     // different NPCs prefabs 
     public Transform spawnPoint;
     public Transform stationPoint;
     public Transform exitPoint;
 
     private GameObject currentNPC;
-    private int currentNPCIndex = 0; // Tracks NPC to spawn next
+    private int currentNPCIndex = 0;    // Tracks NPC to spawn next
 
     [Header("Score Tracking")]
     public int correctCount = 0;
     public int wrongCount = 0;
+
+    [Header("Exit Settings")]
+    public GameObject exitBlocker;      // Door Object blocking the shop exit
+    public GameObject exitVisualPrompt; // Visual indicator for player to see the exit after finishing job
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -56,6 +60,7 @@ public class ShopManager : MonoBehaviour
         if (currentNPCIndex >= npcPrefabs.Length)
         {
             Debug.Log("No more customers for the day");
+            OpenShopExit();
             // ShowGameOver();
             return;
         }
@@ -89,7 +94,25 @@ public class ShopManager : MonoBehaviour
         }
     }
 
+    // 
+    void OpenShopExit()
+    {
+        if (exitBlocker != null)
+        {
+            // disable the door object
+            exitBlocker.SetActive(false);
 
+            // Future scope: Trigger door open animation 
+            // exitBlocker.GetComponent<Animator>().SetTrigger("Open");
+        }
+
+        if (exitVisualPrompt != null)
+        {
+            exitVisualPrompt.SetActive(true); // Show the player where to go
+        }
+    }
+
+    // save score and show game over scene
     void ShowGameOver()
     {
         // Store stats in a static class or PlayerPrefs to read them in the next scene

@@ -1,3 +1,4 @@
+using System.Xml;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,7 +8,17 @@ public class SceneLoader : MonoBehaviour
         GameScene,
         Loading,
         MainMenu,
-        GameSceneOutside
+        GameSceneOutside,
+        GameOver
+    }
+
+    // private variables
+    private ShopManager shopManager;
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        shopManager = FindFirstObjectByType<ShopManager>();
     }
 
     // attach to button to load into any scene
@@ -21,7 +32,24 @@ public class SceneLoader : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            SceneManager.LoadScene(Scene.GameSceneOutside.ToString());
+            string currentSceneName = SceneManager.GetActiveScene().name;
+
+            // Scene 1 (Shop), go to Scene 2 (Outside)
+            if (currentSceneName == Scene.GameScene.ToString()) 
+            {
+                if (shopManager != null)
+                {
+                    PlayerPrefs.SetInt("Correct", shopManager.correctCount);
+                    PlayerPrefs.SetInt("Wrong", shopManager.wrongCount);
+                    PlayerPrefs.Save();
+                }
+                SceneManager.LoadScene(Scene.GameSceneOutside.ToString());
+            }
+            // Scene 2 go to GameOver scene
+            else if (currentSceneName == Scene.GameSceneOutside.ToString())
+            {
+                SceneManager.LoadScene(Scene.GameOver.ToString());
+            }
         }
     }
 }

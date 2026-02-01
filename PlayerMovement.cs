@@ -79,6 +79,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.E) && currentHit != null)
         {
+            // use switch case for more Layer in the future
             if (currentHit.gameObject.layer == npcLayer)
             {
                 currentHit.GetComponent<EmotionNPC>().Interact(currentHeldMask);    // use EmotionNPC Interact() to do Mask stuff
@@ -147,8 +148,9 @@ public class PlayerMovement : MonoBehaviour
             currentUIAboveHead = Instantiate(nameTagPrefab);
         }
 
-        // Position UI text above mask object
-        currentUIAboveHead.transform.position = target.position + new Vector3(0, 0.8f, 0);
+        // Position and Adjust UI text above object (Mask or NPC)
+        float heightOffset = target.gameObject.layer == LayerMask.NameToLayer("NPC") ? 2.0f : 1.5f;
+        currentUIAboveHead.transform.position = target.position + new Vector3(0, heightOffset, 0);
 
         // Set the text to the mask's name
         TextMeshProUGUI tmpText = currentUIAboveHead.GetComponentInChildren<TextMeshProUGUI>();
@@ -156,13 +158,13 @@ public class PlayerMovement : MonoBehaviour
         {
             // Get layer index
             int npcLayer = LayerMask.NameToLayer("NPC");
-            string objectName = target.gameObject.name.Replace("Varient(Clone)", "").Trim();
+            string objectName = target.gameObject.name.Replace("(Clone)", "").Trim();
 
             // Experiment: If it's an NPC, add the interaction prompt
             if (target.gameObject.layer == npcLayer)
             {
                 // Context prompt for NPC
-                tmpText.text = $"<color=#FFFF00><size=80%>[Press E to Interact]</size></color>"; // {objectName}\n
+                tmpText.text = "[Press E to Interact]"; // {objectName}\n
             }
             else
             {
