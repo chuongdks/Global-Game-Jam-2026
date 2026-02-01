@@ -7,9 +7,11 @@ public class EmotionNPC : MonoBehaviour
     public string npcName;
 
     [Header("Dialogues")]
-    public string[] introDialogues;     // initial conversation lines
-    public string[] successDialogue;    // Right Mask Dialogues
-    public string[] wrongMaskDialogue;  // Wrong Mask Dialogues
+    public string[] introDialogues;         // initial conversation lines
+    public string[] successDialogue;        // Right Mask Dialogues
+    public string[] wrongMaskDialogue;      // Wrong Mask Dialogues
+    public string[] maskedSuccessGreeting;  // Scene 2 NPC with Correct Mask dialogues
+    public string[] maskedWrongGreeting;    // Scene 2 NPC with Wrong Mask dialogues
 
     [Header("Win Condition")]
     public string correctMaskName;
@@ -20,7 +22,9 @@ public class EmotionNPC : MonoBehaviour
     // private variables
     private DialogueManager dialogueManager;
     private ShopManager shopManager;
-    private bool hasIntroduced = false; // Tracks if Intro dialogues has played
+    private bool hasIntroduced = false;     // Tracks if Intro dialogues has played
+    private bool hasMaskEquipped = false;   // Tracks if NPC has a mask on Start
+    private string savedMaskName; // Stores the name of the mask loaded
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -31,9 +35,9 @@ public class EmotionNPC : MonoBehaviour
         // Check if this NPC already has a mask saved
         if (PlayerPrefs.HasKey(uniqueID))
         {
-            UnityEngine.Debug.Log("test");
-            string savedMaskName = PlayerPrefs.GetString(uniqueID);
+            savedMaskName = PlayerPrefs.GetString(uniqueID);
             LoadSavedMask(savedMaskName);
+            hasMaskEquipped = true;
         }
     }
 
@@ -46,11 +50,26 @@ public class EmotionNPC : MonoBehaviour
     // called by PlayerMovement script
     public void Interact(GameObject heldItem)
     {
-        // trigger intro DIalogue when first time talking to the NPC
+        // trigger intro Dialogue when first time talking to the NPC
         if (!hasIntroduced)
         {
             dialogueManager.StartDialogue(introDialogues, null, false);
             hasIntroduced = true; 
+            return;
+        }
+
+        // check If NPCs already has a mask
+        if (hasMaskEquipped)
+        {
+            // Compare the name of the mask they are wearing to the 'correct' one
+            if (savedMaskName.Contains(correctMaskName))
+            {
+                dialogueManager.StartDialogue(maskedSuccessGreeting, null, false);
+            }
+            else
+            {
+                dialogueManager.StartDialogue(maskedWrongGreeting, null, false);
+            }
             return;
         }
 
@@ -85,7 +104,7 @@ public class EmotionNPC : MonoBehaviour
         }
 
         // Save the mask choice permanently
-        UnityEngine.Debug.Log(heldItem.name);
+        UnityEngine.Debug.Log($"Saving {heldItem.name} to NPC {uniqueID}");
         PlayerPrefs.SetString(uniqueID, heldItem.name);
         PlayerPrefs.Save();
 
@@ -114,13 +133,12 @@ public class EmotionNPC : MonoBehaviour
         // shopManager.CustomerServed();  // Tell dialogueManager to prep next NPC
     }
 
-    // 
+    // Helper function: Load the Mask onto NPC face on spawn
     void LoadSavedMask(string maskName)
     {
-        // You would need a reference to your Mask Prefabs to Instantiate them
-        // This is a simplified example:
-        UnityEngine.Debug.Log("test");
-        GameObject maskPrefab = Resources.Load<GameObject>(maskName); // "Masks/" +
+        UnityEngine.Debug.Log($"NPC {uniqueID} is attempting to load mask: {maskName}");
+
+        GameObject maskPrefab = Resources.Load<GameObject>(maskName); 
         if (maskPrefab != null)
         {
             GameObject newMask = Instantiate(maskPrefab);
@@ -128,6 +146,11 @@ public class EmotionNPC : MonoBehaviour
             newMask.transform.SetParent(faceSocket);
             newMask.transform.localPosition = Vector3.zero;
             newMask.GetComponent<Collider2D>().enabled = false;
+            UnityEngine.Debug.Log("Mask loaded successfully!");
+        }
+        else
+        {
+            UnityEngine.Debug.LogError($"Could not find mask prefab named {maskName} in Resources folder!");
         }
     }
 }

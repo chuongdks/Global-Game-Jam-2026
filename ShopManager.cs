@@ -18,13 +18,32 @@ public class ShopManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        // reset PlayerPrefs for the NPC's mask
+        for (int i = 0; i < npcPrefabs.Length; i++) 
+        {
+            string key = "NPC_" + i;
+            if (PlayerPrefs.HasKey(key))
+            {
+                PlayerPrefs.DeleteKey(key);
+                Debug.Log("Reset mask for: " + key);
+            }
+        }
+        PlayerPrefs.Save();
+
         SpawnNextNPC();
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        // Pressing R and Delete to resets the game
+        if (Input.GetKey(KeyCode.R) && Input.GetKeyDown(KeyCode.Delete))
+        {
+            PlayerPrefs.DeleteAll();
+            Debug.Log("Data Cleared!");
+            // Optional: Reload the scene to see the NPCs lose their masks instantly
+            UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+        }
     }
 
     public void SpawnNextNPC()
@@ -45,8 +64,7 @@ public class ShopManager : MonoBehaviour
 
         // Assign the walk points to the NPC
         var nav = currentNPC.GetComponent<NPCNavigation>();
-        nav.stationPoint = stationPoint;
-        nav.exitPoint = exitPoint;
+        nav.SetupPath(stationPoint, exitPoint);
         currentNPCIndex++;
     }
 
